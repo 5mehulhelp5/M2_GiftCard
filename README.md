@@ -1,29 +1,17 @@
-# Market_GiftCard
+# Market Gift Card Module
 
-Magento 2 module that provides gift card functionality, allowing customers to purchase and redeem gift cards during checkout.
+A Magento 2 module that enables merchants to sell and manage gift cards as a dedicated product type. Customers can purchase gift cards, send them to recipients by email, and redeem them at checkout against any order.
 
-## Overview
+## Features
 
-The module creates and manages gift cards with unique codes that can be assigned to customers and redeemed against orders. Each gift card tracks its initial and current value, recipient details, and full usage history through the `market_gift_card` and `market_gift_card_usage` tables.
-
-A custom `giftcard` product type (extending virtual products) lets merchants sell gift cards through the standard catalog, with support for custom amounts via the `is_custom_allowed` EAV attribute.
+- **Gift Card Product Type** — a first-class catalog product type (`giftcard`) that merchants create and manage like any other product
+- **Custom Amounts** — optional `is_custom_allowed` attribute lets customers enter their own gift card value at purchase
+- **Recipient Details** — each card stores recipient name and email for delivery
+- **Balance Tracking** — initial and current value tracked per card; every redemption is recorded with the order reference and amount used
+- **Service Contract API** — full repository layer with `SearchCriteria` support for integration and REST API consumption
+- **Inventory Bypass** — gift cards skip standard qty/inventory checks since they are generated on demand
 
 ## Installation
-
-### Manual
-
-1. Copy the module to `app/code/Market/GiftCard`
-2. Run the following commands:
-
-```bash
-bin/magento module:enable Market_GiftCard
-bin/magento setup:upgrade
-bin/magento setup:di:compile
-bin/magento setup:static-content:deploy
-bin/magento cache:flush
-```
-
-### Via Composer
 
 ```bash
 composer require market/module-gift-card
@@ -34,149 +22,61 @@ bin/magento setup:static-content:deploy
 bin/magento cache:flush
 ```
 
-## Module Structure
+## How It Works
 
-```
-Market/GiftCard/
-├── Api/
-│   ├── Data/
-│   │   ├── GiftCardInterface.php
-│   │   ├── GiftCardSearchResultsInterface.php
-│   │   ├── GiftCardUsageInterface.php
-│   │   └── GiftCardUsageSearchResultsInterface.php
-│   ├── GiftCardRepositoryInterface.php
-│   └── GiftCardUsageRepositoryInterface.php
-├── Model/
-│   ├── Attributes.php
-│   ├── GiftCard.php
-│   ├── GiftCardRepository.php
-│   ├── GiftCardSearchResults.php
-│   ├── GiftCardUsage.php
-│   ├── GiftCardUsageRepository.php
-│   ├── GiftCardUsageSearchResults.php
-│   ├── ResourceModel/
-│   │   ├── GiftCard.php
-│   │   ├── GiftCard/Collection.php
-│   │   ├── GiftCardUsage.php
-│   │   └── GiftCardUsage/Collection.php
-│   └── Type/
-│       └── GiftCard.php
-├── Setup/
-│   └── Patch/Data/
-│       ├── ApplyAttributesUpdate.php
-│       └── CreateCustomAllowed.php
-├── etc/
-│   ├── db_schema.xml
-│   ├── db_schema_whitelist.json
-│   ├── di.xml
-│   ├── module.xml
-│   └── product_types.xml
-├── composer.json
-├── README.md
-└── registration.php
-```
+### Creating a Gift Card Product
 
-## Database Schema
+1. Go to **Catalog > Products > Add Product**
+2. Select **Gift Card Product** as the product type
+3. Set a price (fixed) or enable **Allow Custom Amount** for open-value cards
+4. Set the recipient name and email fields — these are stored on the generated gift card record
 
-### `market_gift_card`
+### Purchasing & Generating
 
-Stores gift card records.
+When a customer purchases a gift card product, a `market_gift_card` record is created with:
 
-| Column | Type | Description |
-| --- | --- | --- |
-| `id` | int | Primary key |
-| `assigned_customer_id` | int | FK to `customer_entity` (CASCADE delete) |
-| `code` | varchar(255) | Unique gift card code |
-| `status` | int | Card status (active, used, expired, etc.) |
-| `initial_value` | decimal(12,4) | Original card value |
-| `current_value` | decimal(12,4) | Remaining balance |
-| `recipient_email` | varchar(255) | Recipient email address |
-| `recipient_name` | varchar(255) | Recipient name |
-| `created_at` | timestamp | Creation date |
-| `updated_at` | timestamp | Last updated date |
+- A unique code
+- The purchased value as both `initial_value` and `current_value`
+- The recipient's name and email
+- Status set to active
 
-### `market_gift_card_usage`
+### Redeeming at Checkout
 
-Tracks usage history per gift card.
+Customers enter the gift card code at checkout. The module:
 
-| Column | Type | Description |
-| --- | --- | --- |
-| `id` | int | Primary key |
-| `gift_card_id` | int | FK to `market_gift_card` (CASCADE delete) |
-| `order_id` | int | FK to `sales_order` (CASCADE delete) |
-| `value_change` | decimal(20,6) | Amount used in this transaction |
-| `notes` | text | Optional notes |
-| `created_at` | timestamp | Usage date |
+1. Looks up the card by code via `GiftCardRepositoryInterface::getByCode()`
+2. Validates the card is active and has sufficient balance
+3. Deducts the used amount from `current_value`
+4. Writes a `market_gift_card_usage` record linking the card to the order
 
-## Module Architecture
+### Balance History
 
-### Product Type
+Every redemption is stored in `market_gift_card_usage` with the order ID, amount used, and an optional note — giving merchants a full audit trail per card.
 
-The `giftcard` product type extends `Magento\Catalog\Model\Product\Type\Virtual`, inheriting virtual product behavior (non-shippable, no weight). It is registered in `etc/product_types.xml` with the `SimpleProductPrice` indexer.
+## API
 
-### Service Contracts (`Api/Data/`)
+The module exposes its data through Magento service contracts, accessible via REST API or direct injection.
 
-| Interface | Description |
+### GiftCardRepositoryInterface
+
+| Method | Description |
 | --- | --- |
-| `GiftCardInterface` | Defines getters/setters for all gift card fields |
-| `GiftCardUsageInterface` | Defines getters/setters for usage record fields |
-| `GiftCardSearchResultsInterface` | Search results for gift card queries |
-| `GiftCardUsageSearchResultsInterface` | Search results for usage queries |
+| `getById(int $id)` | Load a gift card by its primary key |
+| `getByCode(string $code)` | Load a gift card by its unique code |
+| `save(GiftCardInterface $card)` | Create or update a gift card |
+| `delete(GiftCardInterface $card)` | Delete a gift card |
+| `deleteById(int $id)` | Delete a gift card by ID |
+| `getList(SearchCriteriaInterface)` | Search/filter/paginate gift cards |
 
-### Repositories (`Api/`)
+### GiftCardUsageRepositoryInterface
 
-| Interface | Description |
+| Method | Description |
 | --- | --- |
-| `GiftCardRepositoryInterface` | CRUD + `getByCode()` + `getList()` for gift cards |
-| `GiftCardUsageRepositoryInterface` | CRUD + `getList()` for usage records |
-
-Both repositories support `SearchCriteriaInterface` for filtered, sorted, and paginated queries.
-
-### Models (`Model/`)
-
-| Class | Description |
-| --- | --- |
-| `GiftCard` | Implements `GiftCardInterface`, extends `AbstractModel` |
-| `GiftCardUsage` | Implements `GiftCardUsageInterface`, extends `AbstractModel` |
-| `GiftCardRepository` | Implements `GiftCardRepositoryInterface` |
-| `GiftCardUsageRepository` | Implements `GiftCardUsageRepositoryInterface` |
-| `Type\GiftCard` | Custom product type extending `Virtual` |
-| `Attributes` | Constants for EAV attribute codes |
-
-### Resource Models (`Model/ResourceModel/`)
-
-| Class | Table |
-| --- | --- |
-| `GiftCard` | `market_gift_card` |
-| `GiftCard\Collection` | Collection for gift card records |
-| `GiftCardUsage` | `market_gift_card_usage` |
-| `GiftCardUsage\Collection` | Collection for usage records |
-
-### Data Patches (`Setup/Patch/Data/`)
-
-| Patch | Description |
-| --- | --- |
-| `ApplyAttributesUpdate` | Registers the `price` attribute for the `giftcard` product type |
-| `CreateCustomAllowed` | Creates the `is_custom_allowed` EAV attribute (boolean, global scope) |
-
-### Dependency Injection (`etc/di.xml`)
-
-All service contract interfaces are mapped to their concrete implementations:
-
-- `GiftCardInterface` → `Model\GiftCard`
-- `GiftCardUsageInterface` → `Model\GiftCardUsage`
-- `GiftCardRepositoryInterface` → `Model\GiftCardRepository`
-- `GiftCardUsageRepositoryInterface` → `Model\GiftCardUsageRepository`
-- `GiftCardSearchResultsInterface` → `Model\GiftCardSearchResults`
-- `GiftCardUsageSearchResultsInterface` → `Model\GiftCardUsageSearchResults`
-
-## Uninstalling
-
-```bash
-bin/magento module:uninstall Market_GiftCard
-bin/magento setup:upgrade
-bin/magento cache:flush
-```
+| `getById(int $id)` | Load a usage record by ID |
+| `save(GiftCardUsageInterface $usage)` | Create or update a usage record |
+| `delete(GiftCardUsageInterface $usage)` | Delete a usage record |
+| `deleteById(int $id)` | Delete a usage record by ID |
+| `getList(SearchCriteriaInterface)` | Search/filter/paginate usage history |
 
 ## Dependencies
 

@@ -10,7 +10,7 @@
     <preference for="Market\GiftCard\Api\Data\GiftCardUsageSearchResultsInterface" type="Market\GiftCard\Model\GiftCardUsageSearchResults" />
 
 
-    <virtualType name="Market\GiftCars\Model\ResourceModel\Product\Indexer\Price\GiftCardProductPrice"
+    <virtualType name="Market\GiftCard\Model\ResourceModel\Product\Indexer\Price\GiftCardProductPrice"
                  type="Magento\Catalog\Model\ResourceModel\Product\Indexer\Price\SimpleProductPrice">
         <arguments>
             <argument name="productType" xsi:type="const">Market\GiftCard\Model\Type\GiftCard::TYPE_CODE</argument>
