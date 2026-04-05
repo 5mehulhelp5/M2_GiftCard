@@ -60,6 +60,7 @@ class CreateCustomAllowed implements DataPatchInterface, PatchRevertableInterfac
                 'used_in_product_listing' => true,
                 'unique' => false,
                 'apply_to' => GiftCard::TYPE_CODE,
+                'group' => 'General',
             ]
         );
 

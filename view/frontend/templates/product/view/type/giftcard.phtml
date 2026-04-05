@@ -1,10 +1,21 @@
 <?php
 /* @var $block \Market\GiftCard\ViewModel\Product\Details $details */
 
+use Market\GiftCard\Model\Attributes;
+
 $details = $block->getData('details');
 ?>
 
+
 <div class="giftcard-options">
+<?php if ($details->getIsCustomAmountAllowed()) : ?>
+    <div class="field required">
+        <label for="<?= Attributes::OPTION_AMOUNT ?>" class="label"><span><?= __('Amount') ?></span></label>
+        <div class="control">
+            <input type="number" name="<?= Attributes::OPTION_AMOUNT ?>" id="<?= Attributes::OPTION_AMOUNT ?>" value="" class="input-text" min="0" step="0.01" placeholder="<?= __('Enter amount') ?>" required />
+        </div>
+    </div>
+<?php endif; ?>
     <div class="field required">
         <label for="recipient_name" class="label"><span><?= __('Recipient Name') ?></span></label>
         <div class="control">
