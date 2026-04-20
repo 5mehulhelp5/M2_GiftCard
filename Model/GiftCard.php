@@ -8,6 +8,10 @@ use Market\GiftCard\Api\Data\GiftCardInterface;
 class GiftCard extends AbstractModel implements GiftCardInterface
 {
 
+    public const  STATUS_ACTIVE = 1;
+    public const STATUS_USED = 2;
+    public const  STATUS_EXPIRED = 3;
+
     public function _construct()
     {
         $this->_init(ResourceModel\GiftCard::class);
