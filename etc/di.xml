@@ -18,6 +18,23 @@
     </virtualType>
 
 
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="market_giftcard_listing_data_source" xsi:type="string">Market\GiftCard\Model\ResourceModel\GiftCard\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Market\GiftCard\Model\ResourceModel\GiftCard\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">market_gift_card</argument>
+            <argument name="eventPrefix" xsi:type="string">market_giftcard_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">market_giftcard_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Market\GiftCard\Model\ResourceModel\GiftCard</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsProductSalableForRequestedQtyConditionChain" >
         <plugin name="PreventInventoryForGiftCard" type="Market\GiftCard\Plugin\PreventInventoryForGiftCard" />
     </type>
