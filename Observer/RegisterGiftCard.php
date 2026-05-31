@@ -106,7 +106,7 @@ class RegisterGiftCard implements ObserverInterface
         $giftCard->setCode($this->codeGenerator->getNewCode());
         $giftCard->setStatus(GiftCardModel::STATUS_ACTIVE);
 
-        $this->giftCardRepository->save($giftCard);
+        $this->giftCardRepository->save($giftCard, (int)$orderItem->getStoreId());
     }
 
     private function getOrderItem(InvoiceItemInterface $item): OrderItemInterface

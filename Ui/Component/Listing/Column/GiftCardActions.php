@@ -12,8 +12,8 @@ use Magento\Ui\Component\Listing\Columns\Column;
 class GiftCardActions extends Column
 {
     /** Url path */
-    public const  GIFTCARD_URL_PATH_EDIT = 'giftcard/edit';
-    public const  GIFTCARD_URL_PATH_DELETE = 'giftcard/delete';
+    public const  GIFTCARD_URL_PATH_EDIT = '*/edit';
+    public const  GIFTCARD_URL_PATH_DELETE = '*/delete';
 
     public function __construct(
         ContextInterface $context,

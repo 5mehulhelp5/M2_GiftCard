@@ -26,11 +26,12 @@ interface GiftCardRepositoryInterface
     public function getByCode(string $code): GiftCardInterface;
 
     /**
-     * @param \Market\GiftCard\Api\Data\GiftCardInterface $giftCard
-     * @return \Market\GiftCard\Api\Data\GiftCardInterface
+     * @param GiftCardInterface $giftCard
+     * @param int|null $storeId
+     * @return GiftCardInterface
      * @throws CouldNotSaveException
      */
-    public function save(GiftCardInterface $giftCard): GiftCardInterface;
+    public function save(GiftCardInterface $giftCard, int $storeId = null): GiftCardInterface;
 
     /**
      * @param \Market\GiftCard\Api\Data\GiftCardInterface $giftCard

@@ -12,7 +12,7 @@ class GiftCard extends AbstractModel implements GiftCardInterface
     public const STATUS_USED = 2;
     public const  STATUS_EXPIRED = 3;
 
-    protected $_eventPrefix = 'market_gift_card';
+    protected $_eventPrefix = 'gift_card';
     protected $_eventObject = 'gift_card';
 
     public function _construct()

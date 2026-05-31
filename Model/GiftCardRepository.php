@@ -11,6 +11,7 @@ use Market\GiftCard\Api\Data\GiftCardInterface;
 use Market\GiftCard\Api\Data\GiftCardSearchResultsInterface;
 use Market\GiftCard\Api\Data\GiftCardSearchResultsInterfaceFactory;
 use Market\GiftCard\Api\GiftCardRepositoryInterface;
+use Market\GiftCard\Model\Email\EmailSender;
 use Market\GiftCard\Model\ResourceModel\GiftCard as GiftCardResource;
 use Market\GiftCard\Model\ResourceModel\GiftCard\CollectionFactory;
 
@@ -40,19 +41,22 @@ class GiftCardRepository implements GiftCardRepositoryInterface
      * @var CollectionProcessorInterface
      */
     private CollectionProcessorInterface $collectionProcessor;
+    private EmailSender $emailSender;
 
     public function __construct(
         GiftCardResource $resource,
         GiftCardFactory $giftCardFactory,
         CollectionFactory $collectionFactory,
         GiftCardSearchResultsInterfaceFactory $searchResultsFactory,
-        CollectionProcessorInterface $collectionProcessor
+        CollectionProcessorInterface $collectionProcessor,
+        EmailSender $emailSender
     ) {
         $this->resource = $resource;
         $this->giftCardFactory = $giftCardFactory;
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->collectionProcessor = $collectionProcessor;
+        $this->emailSender = $emailSender;
     }
 
     /**
@@ -88,10 +92,16 @@ class GiftCardRepository implements GiftCardRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function save(GiftCardInterface $giftCard): GiftCardInterface
+    public function save(GiftCardInterface $giftCard, int $storeId = null): GiftCardInterface
     {
         try {
+            $canNotify = !(bool)$giftCard->getId();
+
             $this->resource->save($giftCard);
+
+            if ($canNotify) {
+                $this->emailSender->send($giftCard, $storeId);
+            }
         } catch (\Exception $e) {
             throw new CouldNotSaveException(__('Could not save gift card: %1', $e->getMessage()), $e);
         }
