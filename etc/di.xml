@@ -3,6 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Market\GiftCard\Api\Data\GiftCardInterface" type="Market\GiftCard\Model\GiftCard" />
     <preference for="Market\GiftCard\Api\Data\GiftCardUsageInterface" type="Market\GiftCard\Model\GiftCardUsage" />
+    <preference for="Market\GiftCard\Api\Data\GiftCardQuoteInterface" type="Market\GiftCard\Model\GiftCardQuote" />
 
     <preference for="Market\GiftCard\Api\GiftCardRepositoryInterface" type="Market\GiftCard\Model\GiftCardRepository" />
     <preference for="Market\GiftCard\Api\GiftCardUsageRepositoryInterface" type="Market\GiftCard\Model\GiftCardUsageRepository" />
@@ -44,6 +45,14 @@
     </type>
 
     <type name="Magento\CatalogInventory\Model\Quote\Item\QuantityValidator" >
-        <plugin name="PreventQtyLookupForGiftCard" type="\Market\GiftCard\Plugin\PreventQtyLookupForGiftCard" />
+        <plugin name="PreventQtyLookupForGiftCard" type="Market\GiftCard\Plugin\PreventQtyLookupForGiftCard" />
+    </type>
+
+    <type name="Magento\Quote\Model\QuoteFactory" >
+        <plugin name="EnsureQuoteExtensionAttributes" type="Market\GiftCard\Plugin\EnsureQuoteExtensionAttributes" />
+    </type>
+
+    <type name="Magento\Quote\Api\CartRepositoryInterface" >
+        <plugin name="AssignGiftCardIdToQuote" type="Market\GiftCard\Plugin\AssignGiftCardIdToQuote" />
     </type>
 </config>

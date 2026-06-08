@@ -31,5 +31,17 @@
             "MARKET_GIFT_CARD_USAGE_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
             "PRIMARY": true
         }
+    },
+    "market_gift_card_quote": {
+        "column": {
+            "id": true,
+            "gift_card_id": true,
+            "quote_id": true
+        },
+        "constraint": {
+            "MARKET_GIFT_CARD_QUOTE_GIFT_CARD_ID_MARKET_GIFT_CARD_ID": true,
+            "MARKET_GIFT_CARD_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
+            "PRIMARY": true
+        }
     }
 }

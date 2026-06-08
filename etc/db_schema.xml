@@ -58,4 +58,23 @@
         </constraint>
     </table>
 
+    <table name="market_gift_card_quote" resource="default" engine="innodb" comment="Gift Cards to Quote">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+
+        <column xsi:type="int" name="gift_card_id" padding="10" unsigned="true" nullable="false" comment="Gift Card ID"/>
+        <column xsi:type="int" name="quote_id" padding="10" unsigned="true" nullable="false" comment="Quote ID"/>
+
+        <constraint xsi:type="foreign" referenceId="MARKET_GIFT_CARD_QUOTE_GIFT_CARD_ID_MARKET_GIFT_CARD_ID"
+                    table="market_gift_card_quote" column="gift_card_id" referenceTable="market_gift_card"
+                    referenceColumn="id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="foreign" referenceId="MARKET_GIFT_CARD_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID"
+                    table="market_gift_card_quote" column="quote_id" referenceTable="quote"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+
 </schema>
