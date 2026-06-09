@@ -9,6 +9,7 @@
     <preference for="Market\GiftCard\Api\GiftCardUsageRepositoryInterface" type="Market\GiftCard\Model\GiftCardUsageRepository" />
     <preference for="Market\GiftCard\Api\Data\GiftCardSearchResultsInterface" type="Market\GiftCard\Model\GiftCardSearchResults" />
     <preference for="Market\GiftCard\Api\Data\GiftCardUsageSearchResultsInterface" type="Market\GiftCard\Model\GiftCardUsageSearchResults" />
+    <preference for="Market\GiftCard\Api\GiftCardRetrieverInterface" type="Market\GiftCard\Model\GiftCardRetriever" />
 
 
     <virtualType name="Market\GiftCard\Model\ResourceModel\Product\Indexer\Price\GiftCardProductPrice"
