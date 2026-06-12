@@ -44,7 +44,7 @@ class GiftCardQuote extends AbstractDb
                     $quoteId
                 )
             );
-        } else {
+        } elseif ($giftCardId) {
             //insert new record
             $connection = $this->getConnection();
             $connection->insert(
